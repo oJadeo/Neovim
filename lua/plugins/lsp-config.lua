@@ -95,6 +95,9 @@ return {
 		local servers = {
 
 			stylua = {}, -- Used to format Lua code
+			marksman = {
+				enable = false,
+			},
 
 			-- Special Lua Config, as recommended by neovim help docs
 			lua_ls = {
