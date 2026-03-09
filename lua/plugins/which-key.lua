@@ -16,6 +16,7 @@ return { -- Useful plugin to show you pending keybinds.
 			{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
 			{ "gr", group = "LSP Actions", mode = { "n" } },
 			{ "<leader>o", group = "[O]bsidian" },
+			{ "<leader>on", group = "[O]bsidian [N]ew Note" },
 			{ "<leader>m", group = "[M]arkdown" },
 		},
 	},

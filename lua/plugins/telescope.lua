@@ -113,12 +113,6 @@ return {
 			vim.keymap.set("n", "<leader>sn", function()
 				builtin.find_files({ cwd = vim.fn.stdpath("config") })
 			end, { desc = "[S]earch [N]eovim files" })
-
-			vim.keymap.set("n", "<leader>on", "<cmd>ObsidianNew<cr>", { desc = "[N]ew Obsidian Note" })
-			vim.keymap.set("n", "<leader>oo", "<cmd>Obsidian search<cr>", { desc = "Search [O]bisidian Notes" })
-			vim.keymap.set("n", "<leader>ot", "<cmd>Obsidian tags<cr>", { desc = "Search [T]ags" })
-			vim.keymap.set("n", "<leader>ob", "<cmd>ObsidianBacklinks<cr>", { desc = "Search [B]ackLinks" })
-			vim.keymap.set("n", "<leader>ol", "<cmd>ObsidianLinks<cr>", { desc = "Search [L]inks" })
 		end,
 	},
 }

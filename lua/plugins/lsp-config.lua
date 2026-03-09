@@ -95,6 +95,9 @@ return {
 		local servers = {
 
 			stylua = {}, -- Used to format Lua code
+			marksman = {
+				enable = false,
+			},
 
 			eslint = {
 				settings = { packageManager = "npm" },
