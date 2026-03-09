@@ -20,6 +20,22 @@ return {
 				extensions = {
 					["ui-select"] = { require("telescope.themes").get_dropdown() },
 				},
+				pickers = {
+					find_files = {
+						preview = {
+							filetype_hook = function(filepath, bufnr, opts)
+								if opts.ft ~= "markdown" then
+									return true
+								end
+
+								local ui = require("render-markdown.core.ui")
+								ui.update(bufnr, opts.winid, "Telescope", true)
+
+								return true
+							end,
+						},
+					},
+				},
 			})
 
 			-- Enable Telescope extensions if they are installed

@@ -18,6 +18,7 @@ return { -- Useful plugin to show you pending keybinds.
 			{ "<leader>o", group = "[O]bsidian" },
 			{ "<leader>on", group = "[O]bsidian [N]ew Note" },
 			{ "<leader>m", group = "[M]arkdown" },
+			{ "<leader>e", group = "Yazi" },
 		},
 	},
 }
