@@ -92,12 +92,10 @@ return {
 		--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 		--  See `:help lsp-config` for information about keys and how to configure
 		---@type table<string, vim.lsp.Config>
+		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		local servers = {
 
 			stylua = {}, -- Used to format Lua code
-			marksman = {
-				enable = false,
-			},
 
 			eslint = {
 				settings = { packageManager = "npm" },
@@ -134,6 +132,15 @@ return {
 				settings = {
 					Lua = {},
 				},
+			},
+			markdown_oxide = {
+				capabilities = vim.tbl_deep_extend("force", capabilities, {
+					workspace = {
+						didChangeWatchedFiles = {
+							dynamicRegistration = true,
+						},
+					},
+				}),
 			},
 		}
 

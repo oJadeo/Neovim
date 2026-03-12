@@ -92,7 +92,7 @@ vim.keymap.set("n", "<leader>md", function()
 	local new_lines = vim.split(new_text, "\n")
 	-- Set new lines in buffer
 	vim.api.nvim_buf_set_lines(current_buffer, start_row, end_row + 1, false, new_lines)
-end, { desc = "[M]arkdown [D]ash toggle)" })
+end, { desc = "[M]arkdown [D]ash toggle" })
 
 -- HACK: Manage Markdown tasks in Neovim similar to Obsidian | Telescope to List Completed and Pending Tasks
 -- https://youtu.be/59hvZl077hM
