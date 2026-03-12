@@ -1,6 +1,6 @@
+require("keymaps.markdown.filter")
 require("keymaps.markdown.folding")
 require("keymaps.markdown.navigate")
 require("keymaps.markdown.spell")
 require("keymaps.markdown.style_text")
-require("keymaps.markdown.todo")
 require("keymaps.markdown.which-key")
