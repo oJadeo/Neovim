@@ -11,7 +11,6 @@ local nio = require("nio")
 local function split_prompt(prompt)
 	local tags = {}
 	local project = {}
-	local title = {}
 	local path = {}
 	for word in prompt:gmatch("([^%s]+)") do
 		local fst = word:sub(1, 1)
@@ -19,10 +18,8 @@ local function split_prompt(prompt)
 			table.insert(tags, word:sub(2))
 		elseif fst == "@" then
 			table.insert(project, word:sub(2))
-		elseif fst == "/" then
-			table.insert(path, word)
 		else
-			table.insert(title, word)
+			table.insert(path, word)
 		end
 	end
 
@@ -30,7 +27,6 @@ local function split_prompt(prompt)
 		tags = tags,
 		project = project,
 		path = path,
-		title = vim.fn.join(title, " "),
 	}
 end
 
@@ -82,7 +78,7 @@ local function score_item_type(item)
 		elseif item.type == "Note" then
 			return 0.12
 		else
-			vim.notify("Unknown item type: " .. item.type, vim.log.levels.ERROR)
+			-- vim.notify("Unknown item type: " .. item.type, vim.log.levels.ERROR)
 			return 0
 		end
 	end
@@ -143,73 +139,68 @@ local function content_sorter(opts)
 				return -1
 			end
 
-			local title_score = fzy_sorter:scoring_function(prompt.title, entry.title)
-			if title_score < 0 then
-				return -1
-			end
-
 			local type_score = score_item_type(entry)
 			local date_score = score_date(entry)
 
 			-- Date sorting is only worth 1/10 of the fuzzy scores.
 			-- Why? I dunno, it felt like 1 was too much and 1/10 felt good.
-			return project_score + tags_score + title_score + date_score / 10 + type_score
+			return project_score + tags_score + path_score + date_score / 10 + type_score
 		end,
 	})
 end
 
 local function make_knowledge_display(item)
-	local icon = "󰙨"
+	local icon = "󱛉"
 
 	local displayer = entry_display.create({
 		separator = " ",
 		items = {
 			{ width = 1 },
-			{ width = string.len(item.title) },
+			{ width = string.len(item.path) },
 			{ remaining = true },
 		},
 	})
 
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
-		item.title,
+		item.path,
 		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
 local function make_analysis_display(item)
-	local icon = "󰙨"
+	local icon = ""
 
 	local displayer = entry_display.create({
 		separator = " ",
 		items = {
 			{ width = 1 },
-			{ width = string.len(item.title) },
+			{ width = string.len(item.path) },
 			{ remaining = true },
 		},
 	})
 
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
-		item.title,
+		item.path,
 		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
 
 local function make_note_display(item)
-	local icon = "󰙨"
+	local icon = "󱞁"
 
 	local displayer = entry_display.create({
 		separator = " ",
 		items = {
 			{ width = 1 },
-			{ width = string.len(item.title) },
+			{ width = string.len(item.path) },
 			{ remaining = true },
 		},
 	})
 
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
-		item.title,
+		item.path,
 		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
@@ -223,7 +214,21 @@ local function make_display(entry)
 	elseif item.type == "Note" then
 		return make_note_display(item)
 	else
-		vim.notify("Unknown item type: " .. item.type, vim.log.levels.ERROR)
+		local icon = ""
+		local displayer = entry_display.create({
+			separator = " ",
+			items = {
+				{ width = 1 },
+				{ width = string.len(item.path) },
+				{ remaining = true },
+			},
+		})
+
+		return displayer({
+			{ icon, "TelescopeResultsComment" },
+			item.path,
+			{ tostring(item.alias), "TelescopeResultsComment" },
+		})
 	end
 end
 
@@ -243,7 +248,7 @@ local function format_data(output)
 	local post = {}
 	for _, line in ipairs(lines) do
 		-- When a newline is encountered save the post and prepare for the next entry.
-		if line ~= "" then
+		if line == "" then
 			if next(post) ~= nil then
 				table.insert(posts, post)
 			end
@@ -282,7 +287,7 @@ local function format_data(output)
 		end
 	end
 	-- If output ends we might have an unsaved post.
-	if post.title then
+	if post.path then
 		table.insert(posts, post)
 	end
 
@@ -290,25 +295,13 @@ local function format_data(output)
 end
 
 local function list_markup_content(cb)
-	nio.run(function()
-		-- local rg = nio.process.run({
-		-- 	cmd = "rg",
-		-- 	args = {
-		-- 		"-U",
-		-- 		"-P",
-		-- 		"(?s)^---\\n.*?.*?^---",
-		-- 	},
-		-- })
+	local output = vim.fn.system("rg -NoHU --heading '\\A\\---\\w*\\n(.+\\n)+^---'")
 
-		local output = os.execute("rg -NoHU -P '(?s)^---\\n.*?.*?^---'")
-
-		-- local output = rg.stdout
-		if output then
-			nio.scheduler()
-			local posts = format_data(output)
-			cb(posts)
-		end
-	end)
+	-- local output = rg.stdout
+	if output then
+		local posts = format_data(output)
+		cb(posts)
+	end
 end
 
 local function find_markup(opts)
@@ -336,8 +329,8 @@ local function find_markup(opts)
 						conf.buffer_previewer_maker(entry.value.path, self.state.bufnr, {
 							bufname = self.state.bufname,
 							winid = self.state.winid,
-							preview = opts.preview,
-							file_encoding = opts.file_encoding,
+							preview = true,
+							file_encoding = "UTF-8",
 						})
 					end,
 				}),

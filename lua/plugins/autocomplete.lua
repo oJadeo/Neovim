@@ -58,10 +58,10 @@ return { -- Autocompletion
 				"path",
 				"snippets",
 				"buffer",
-				--"copilot"
+				"copilot",
 			},
 			providers = {
-				--copilot = { name = "copilot", module = "blink-cmp-copilot", score_offset = 100, async = true },
+				copilot = { name = "copilot", module = "blink-cmp-copilot", score_offset = 100, async = true },
 			},
 		},
 		fuzzy = { implementation = "lua" },
