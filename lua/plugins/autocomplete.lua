@@ -26,7 +26,9 @@ return { -- Autocompletion
 					end,
 				},
 			},
-			opts = {},
+			opts = {
+				fuzzy = { implementation = "lua" },
+			},
 		},
 	},
 	---@module 'blink.cmp'
