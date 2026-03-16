@@ -3,7 +3,7 @@ return {
 	lazy = true,
 	cmd = { "Outline", "OutlineOpen" },
 	keys = {
-		{ "<leader>o", "<Cmd>Outline<CR>", desc = "Toggle [O]utline" },
+		{ "<leader>to", "<Cmd>Outline<CR>", desc = "[T]oggle [O]utline" },
 	},
 	opts = {
 		symbol_folding = {
