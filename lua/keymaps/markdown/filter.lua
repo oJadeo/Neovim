@@ -164,7 +164,6 @@ local function make_knowledge_display(item)
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
 		item.path,
-		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
 local function make_analysis_display(item)
@@ -182,7 +181,6 @@ local function make_analysis_display(item)
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
 		item.path,
-		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
 
@@ -201,7 +199,6 @@ local function make_note_display(item)
 	return displayer({
 		{ icon, "TelescopeResultsComment" },
 		item.path,
-		{ tostring(item.year), "TelescopeResultsComment" },
 	})
 end
 
@@ -227,7 +224,6 @@ local function make_display(entry)
 		return displayer({
 			{ icon, "TelescopeResultsComment" },
 			item.path,
-			{ tostring(item.alias), "TelescopeResultsComment" },
 		})
 	end
 end
@@ -246,6 +242,7 @@ local function format_data(output)
 	local posts = {}
 
 	local post = {}
+	local last_key = ""
 	for _, line in ipairs(lines) do
 		-- When a newline is encountered save the post and prepare for the next entry.
 		if line == "" then
@@ -253,25 +250,46 @@ local function format_data(output)
 				table.insert(posts, post)
 			end
 			post = {}
+			last_key = ""
 		-- Skip `---` markers.
 		elseif not string.match(line, "%-%-%-%w*") then
 			-- Try to extract all key value definitions and store them.
-			local key, value = string.match(line, "(%w+)%s*[:=]%s*(.+)")
-			if key then
+			local key, value = string.match(line, "(%w+)%s*[:=]%s*(.*)")
+			-- Optional: Convert empty string to nil for cleaner logic
+			if value == "" then
+				value = nil
+			end
+			if key and value ~= nil then
+				-- vim.notify("Key:" .. key .. " Value:" .. value)
 				-- Strip surrounding quotes.
 				-- Do this here because there's no non-greedy specifier that could be used
 				-- in the key/value regex above.
 				value = trim_quotes(value)
+				if key == "tags" then
+					vim.notify("Tags:" .. value)
+				end
 				-- Split a sequence.
 				local seq = string.match(value, "^%[(.+)%]$")
+				local parts = {}
 				if seq then
-					local parts = {}
 					for part in string.gmatch(seq, "%s*([^,]+)") do
 						table.insert(parts, trim_quotes(part))
 					end
 					value = parts
 				end
 				post[key] = value
+			elseif key and value == nil then
+				-- If the line looks like it should be a key value pair but we couldn't parse
+				last_key = key
+				post[key] = {}
+			elseif line:find("^%s*%-") and last_key then
+				-- If the line doesn't match a key value pair, it might be a continuation of the previous value.
+				-- For example, a multi-line description.
+				local match = line:match("^%s*%-%s*(.+)")
+
+				if match and last_key then
+					table.insert(post[last_key], match)
+				end
 			else
 				-- If no key value pair is found, then we should be at the beginning with the file path.
 				post["path"] = line
@@ -293,9 +311,23 @@ local function format_data(output)
 
 	return posts
 end
+local function tableToString(_table, depth)
+	depth = depth or 0
+	local res = "{\n"
+	local indent = string.rep("\t", depth + 1)
 
+	for k, v in pairs(_table) do
+		res = res .. indent .. "[" .. tostring(k) .. "] = "
+		if type(v) == "table" then
+			res = res .. tableToString(v, depth + 1) .. ";\n"
+		else
+			res = res .. string.format("%q", tostring(v)) .. ";\n"
+		end
+	end
+	return res .. string.rep("\t", depth) .. "}"
+end
 local function list_markup_content(cb)
-	local output = vim.fn.system("rg -NoHU --heading '\\A\\---\\w*\\n(.+\\n)+^---'")
+	local output = vim.fn.system("rg -NoHU --heading '(?s)\\A---\\w*\\n(.*?)\\n---'")
 
 	-- local output = rg.stdout
 	if output then
@@ -329,7 +361,7 @@ local function find_markup(opts)
 						conf.buffer_previewer_maker(entry.value.path, self.state.bufnr, {
 							bufname = self.state.bufname,
 							winid = self.state.winid,
-							preview = true,
+							-- preview = true,
 							file_encoding = "UTF-8",
 						})
 					end,
