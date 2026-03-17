@@ -265,9 +265,6 @@ local function format_data(output)
 				-- Do this here because there's no non-greedy specifier that could be used
 				-- in the key/value regex above.
 				value = trim_quotes(value)
-				if key == "tags" then
-					vim.notify("Tags:" .. value)
-				end
 				-- Split a sequence.
 				local seq = string.match(value, "^%[(.+)%]$")
 				local parts = {}
