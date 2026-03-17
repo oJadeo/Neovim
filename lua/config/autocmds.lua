@@ -1,12 +1,41 @@
+local function augroup(name)
+  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
+end
 vim.api.nvim_create_autocmd("FileType", {
 	group = augroup("wrap_spell"),
-	pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
+	pattern = { "text", "plaintex", "typst", "gitcommit" },
 	callback = function()
 		-- -- By default wrap is set to true regardless of what I chose in my options.lua file,
 		-- -- This sets wrapping for my skitty-notes and I don't want to have
 		-- -- wrapping there, I wanto to decide this in the options.lua file
 		-- vim.opt_local.wrap = false
 		vim.opt_local.spell = true
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	group = augroup("wrap_spell"),
+	pattern = { "markdown" },
+	callback = function(args)
+		-- -- By default wrap is set to true regardless of what I chose in my options.lua file,
+		-- -- This sets wrapping for my skitty-notes and I don't want to have
+		-- -- wrapping there, I wanto to decide this in the options.lua file
+		-- vim.opt_local.wrap = false
+		vim.opt_local.spell = true
+	end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+	group = group,
+	pattern = { "markdown" },
+	callback = function(args)
+		-- Check if treesitter can start for the buffer and language
+		local bufnr = args.buf
+		local lang = vim.treesitter.language.get_lang(vim.bo[bufnr].filetype)
+		if lang then
+			pcall(vim.treesitter.start, bufnr, lang) -- Safely call vim.treesitter.start
+			-- Optional: ensure regex syntax is still active for some plugins
+			-- vim.bo[bufnr].syntax = "on"
+		end
 	end,
 })
 

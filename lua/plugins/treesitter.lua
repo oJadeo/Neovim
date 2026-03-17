@@ -3,8 +3,7 @@ return {
 	lazy = false,
 	build = ":TSUpdate",
 	config = function()
-		local config = require("nvim-treesitter.config")
-		config.setup({
+		require("nvim-treesitter.config").setup({
 			ensure_installed = { "gdscript", "godot_resource", "gdshader", "lua", "markdown", "bash" },
 			auto_install = true,
 			highlight = { enable = true },

@@ -1,4 +1,5 @@
 require("vim-options")
+require("config.autocmds")
 require("lazy").setup("plugins", { ---@diagnostic disable-line: missing-fields
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the

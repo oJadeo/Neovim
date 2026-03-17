@@ -20,6 +20,7 @@ return {
 		},
 		config = function()
 			require("obsidian").setup({
+				ui = { enable = false },
 				legacy_commands = false,
 				workspaces = {
 					{
@@ -57,6 +58,10 @@ return {
 				completions = { lsp = { enabled = true } },
 				checkbox = {
 					checked = { scope_highlight = "@markup.strikethrough" },
+				},
+				code = {
+					enabled = true,
+					inline = true,
 				},
 			})
 		end,
