@@ -1,4 +1,5 @@
 require("keymaps.markdown.filter")
+require("keymaps.markdown.filter_tags")
 require("keymaps.markdown.folding")
 require("keymaps.markdown.navigate")
 require("keymaps.markdown.spell")

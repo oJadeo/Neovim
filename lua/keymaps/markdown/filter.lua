@@ -368,6 +368,6 @@ local function find_markup(opts)
 	end)
 end
 
-vim.keymap.set("n", "<leader>mt", function()
+vim.keymap.set("n", "<leader>mf", function()
 	find_markup()
-end, { desc = "[M]arkdown filter [T]ag" })
+end, { desc = "[M]arkdown [F]ilter content" })
